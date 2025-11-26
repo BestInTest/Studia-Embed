@@ -1,0 +1,3 @@
+SETB P1.7
+CLR P1.5
+END
