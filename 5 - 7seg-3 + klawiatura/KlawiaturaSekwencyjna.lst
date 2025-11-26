@@ -1,0 +1,158 @@
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 1
+
+
+
+
+
+       MCS-51 Family Macro Assembler   A S E M - 5 1   V 1.3
+       =====================================================
+
+
+
+	Source File:	KlawiaturaSekwencyjna.asm
+	Object File:	KlawiaturaSekwencyjna.hex
+	List File:	KlawiaturaSekwencyjna.lst
+
+
+
+ Line  I  Addr  Code            Source
+
+    1:		N      0030	CSDS EQU 30H ; bufor wyboru wskaünika 7-segmentowego
+    2:		N      0038	CSDB EQU 38H ; CSDB bufor danych wskaünika 7-segmentowego
+    3:
+    4:		N      0000	ORG 0
+    5:	  0000	01 40			AJMP START
+    6:
+    7:		N      0040	ORG 40H
+    8:	  0040			START:
+    9:	  0040	C2 96			CLR P1.6
+   10:
+   11:	  0042	78 38			MOV R0, #CSDB
+   12:	  0044	74 FF			MOV A, #255
+   13:	  0046	F2			MOVX @R0, A
+   14:
+   15:	  0047	78 30			MOV R0, #CSDS
+   16:	  0049	7F 01			MOV R7, #00000001B
+   17:
+   18:	  004B			PETLA:
+   19:	  004B	EF			MOV A, R7
+   20:	  004C	F2			MOVX @R0, A
+   21:
+   22:	  004D	A2 B5			MOV C, P3.5
+   23:	  004F	92 96			MOV P1.6, C
+   24:	  0051			DELAY:
+   25:	  0051	DE FE			DJNZ R6, DELAY
+   26:
+   27:	  0053	23			RL A
+   28:	  0054	FF			MOV R7, A
+   29:
+   30:	  0055	80 F4			SJMP PETLA
+   31:				END
+
+
+
+
+
+                     register banks used:  ---
+
+                     no errors
+
+
+
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 2
+
+
+
+
+
+	       L I S T   O F   S Y M B O L S
+	       =============================
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+??ASEM_51			  NUMBER    8051
+??VERSION			  NUMBER    0130
+AC				  BIT	      D6
+ACC				  DATA	      E0
+B				  DATA	      F0
+CSDB				  NUMBER    0038	   2
+CSDS				  NUMBER    0030	   1
+CY				  BIT	      D7
+DELAY				  CODE	    0051	  24
+DPH				  DATA	      83
+DPL				  DATA	      82
+EA				  BIT	      AF
+ES				  BIT	      AC
+ET0				  BIT	      A9
+ET1				  BIT	      AB
+EX0				  BIT	      A8
+EX1				  BIT	      AA
+EXTI0				  CODE	    0003
+EXTI1				  CODE	    0013
+F0				  BIT	      D5
+IE				  DATA	      A8
+IE0				  BIT	      89
+IE1				  BIT	      8B
+INT0				  BIT	      B2
+INT1				  BIT	      B3
+IP				  DATA	      B8
+IT0				  BIT	      88
+IT1				  BIT	      8A
+OV				  BIT	      D2
+P				  BIT	      D0
+P0				  DATA	      80
+P1				  DATA	      90
+P2				  DATA	      A0
+P3				  DATA	      B0
+PCON				  DATA	      87
+PETLA				  CODE	    004B	  18
+PS				  BIT	      BC
+PSW				  DATA	      D0
+PT0				  BIT	      B9
+PT1				  BIT	      BB
+PX0				  BIT	      B8
+PX1				  BIT	      BA
+RB8				  BIT	      9A
+RD				  BIT	      B7
+REN				  BIT	      9C
+RESET				  CODE	    0000
+RI				  BIT	      98
+RS0				  BIT	      D3
+RS1				  BIT	      D4
+RXD				  BIT	      B0
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 3
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+SBUF				  DATA	      99
+SCON				  DATA	      98
+SINT				  CODE	    0023
+SM0				  BIT	      9F
+SM1				  BIT	      9E
+SM2				  BIT	      9D
+SP				  DATA	      81
+START				  CODE	    0040	   8
+T0				  BIT	      B4
+T1				  BIT	      B5
+TB8				  BIT	      9B
+TCON				  DATA	      88
+TF0				  BIT	      8D
+TF1				  BIT	      8F
+TH0				  DATA	      8C
+TH1				  DATA	      8D
+TI				  BIT	      99
+TIMER0				  CODE	    000B
+TIMER1				  CODE	    001B
+TL0				  DATA	      8A
+TL1				  DATA	      8B
+TMOD				  DATA	      89
+TR0				  BIT	      8C
+TR1				  BIT	      8E
+TXD				  BIT	      B1
+WR				  BIT	      B6

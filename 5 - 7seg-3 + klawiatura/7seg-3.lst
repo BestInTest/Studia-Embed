@@ -1,0 +1,286 @@
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 1
+
+
+
+
+
+       MCS-51 Family Macro Assembler   A S E M - 5 1   V 1.3
+       =====================================================
+
+
+
+	Source File:	7seg-3.asm
+	Object File:	7seg-3.hex
+	List File:	7seg-3.lst
+
+
+
+ Line  I  Addr  Code            Source
+
+    1:		N      0030	CSDS EQU 30H; bufor wyboru wskaŸnika 7-segmentowego
+    2:		N      0038	CSDB EQU 38H; bufor danych wskaŸnika 7-segmentowego
+    3:		N      0079	CZAS EQU 079H; Tablica wyœwietlanego czasu
+    4:		N      0078	SS EQU 078H
+    5:		N      0077	MM EQU 077H
+    6:		N      0076	HH EQU 076H
+    7:
+    8:		N      0000	ORG 0
+    9:	  0000	02 00 40		LJMP START
+   10:		N      000B	ORG 0BH
+   11:	  000B	D2 D5			SETB F0
+   12:	  000D	75 8C E2		MOV TH0, #226
+   13:	  0010	32			RETI
+   14:
+   15:		N      0040	ORG 40H
+   16:	  0040			START:
+   17:	  0040	C2 96			CLR P1.6
+   18:	  0042	7F 01			MOV R7, #00000001B ; Rejestr przechowuj¹cy aktualnie wybrany wyœwietlacz
+   19:	  0044	90 00 DB		MOV DPTR, #WZORY ; Zapis adresów wzorów do DPTR
+   20:	  0047	7C 00			MOV R4, #0 ; Aktualnie wyœwietlany symbol
+   21:
+   22:	  0049	75 78 2E		MOV SS, #46
+   23:	  004C	75 77 1E		MOV MM, #30
+   24:	  004F	75 76 0C		MOV HH, #12
+   25:
+   26:	  0052	79 7F			MOV R1, #CZAS+6
+   27:
+   28:	  0054	11 AD			ACALL PRZELICZ
+   29:
+   30:	  0056	75 8C E2		MOV TH0, #226
+   31:	  0059	75 89 30		MOV TMOD, #00110000B
+   32:	  005C	D2 A9			SETB ET0
+   33:	  005E	D2 AF			SETB EA
+   34:	  0060	D2 8C			SETB TR0
+   35:
+   36:	  0062	7C F0			MOV R4, #240
+   37:	  0064	7B 04			MOV R3, #4
+   38:
+   39:	  0066			PETLA:
+   40:	  0066	30 D5 FD		JNB F0, PETLA
+   41:	  0069	C2 D5			CLR F0
+   42:
+   43:					;Jestesmy tu 960 razy na sekunde
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 2
+
+
+
+ Line  I  Addr  Code            Source
+
+   44:
+   45:					;CLR P1.6 ; W³¹czenie wyœwitlacza
+   46:	  006B	78 38			MOV R0, #CSDB ; Przenieœ do R0 adres CSDB
+   47:	  006D	E7			MOV A, @R1 ; Przenieœ do akumulatora aktualnie wybrany symbol
+   48:	  006E	19			DEC R1
+   49:
+   50:	  006F	D2 96			SETB P1.6 ; Wy³¹czenie wyœwietlacza na czas aktualizacji
+   51:
+   52:					;MOVC A, @A+DPTR ; Pobranie wzoru dla segmentu
+   53:	  0071	F2			MOVX @R0, A ; Wysy³amy wzór symbolu do CSDB
+   54:	  0072	78 30			MOV R0, #CSDS ; Przenieœ do R0 adres CSDS
+   55:	  0074	EF			MOV A, R7 ; Przenieœ do akumulatora wybrane wyœwietlacze
+   56:	  0075	F2			MOVX @R0, A ; Wysy³amy wybór do CSDS
+   57:
+   58:	  0076	C2 96			CLR P1.6 ; Ponowne w³¹czenie wyœwietlacza
+   59:	  0078	23			RL A ; Przesuniêcie (rotacja) w lewo aktualnego wyœwietlacza
+   60:
+   61:					; Sprawdzamy siódmy bit w ACC, jeœli nie jest ustawiony to skaczemy do NOACC7
+   62:	  0079	30 E7 04		JNB ACC.7, NOACC7
+   63:	  007C	74 01			MOV A, #00000001B
+   64:	  007E	79 7F			MOV R1, #CZAS+6
+   65:
+   66:
+   67:	  0080			NOACC7:
+   68:	  0080	FF			MOV R7, A ; Zapis wybranego wyœwietlacza po rotacji
+   69:
+   70:	  0081	DC E3			DJNZ R4, PETLA ; Tutaj jestesmy 960 razy na sekunde
+   71:	  0083	DB E1			DJNZ R3, PETLA
+   72:
+   73:	  0085	7C F0			MOV R4, #240
+   74:	  0087	7B 04			MOV R3, #4
+   75:
+   76:					; Tutaj jestesmy raz na sekunde
+   77:	  0089	B2 97			CPL P1.7
+   78:
+   79:	  008B	05 78			INC SS ; zwiêkszanie licznika sekund
+   80:	  008D	E5 78			MOV A, SS
+   81:	  008F	B4 3C 17		CJNE A, #60, ACCNIE60 ; skoczenie do procedury tylko jeœli SS nie bêdzie równe 60 (aby nie w
+				yjœæ poza zakres 60 sekund)
+   82:	  0092	75 78 00		MOV SS, #0
+   83:
+   84:	  0095	05 77			INC MM
+   85:	  0097	E5 77			MOV A, MM
+   86:	  0099	B4 3C 0D		CJNE A, #60, ACCNIE60
+   87:	  009C	75 77 00		MOV MM, #0
+   88:
+   89:	  009F	05 76			INC HH
+   90:	  00A1	E5 76			MOV A, HH
+   91:	  00A3	B4 18 03		CJNE A, #24, ACCNIE60
+   92:	  00A6	75 76 00		MOV HH, #0
+   93:
+   94:	  00A9			ACCNIE60:
+   95:	  00A9	11 AD			ACALL PRZELICZ ; wywo³anie procedury
+   96:	  00AB	80 B9			SJMP PETLA
+   97:
+   98:	  00AD			PRZELICZ:
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 3
+
+
+
+ Line  I  Addr  Code            Source
+
+   99:	  00AD	E5 78			MOV A, SS
+  100:	  00AF	75 F0 0A		MOV B, #10
+  101:	  00B2	84			DIV AB ; dzielenie
+  102:
+  103:					; Aktualizacja segmentów do wyœwietlania
+  104:	  00B3	93			MOVC A, @A+DPTR ;
+  105:	  00B4	F5 7E			MOV CZAS+5, A
+  106:	  00B6	E5 F0			MOV A, B
+  107:	  00B8	93			MOVC A, @A+DPTR
+  108:	  00B9	F5 7F			MOV CZAS+6, A
+  109:
+  110:	  00BB	E5 77			MOV A, MM
+  111:	  00BD	75 F0 0A		MOV B, #10
+  112:	  00C0	84			DIV AB ; dzielenie
+  113:	  00C1	93			MOVC A, @A+DPTR ;
+  114:	  00C2	F5 7C			MOV CZAS+3, A
+  115:	  00C4	E5 F0			MOV A, B
+  116:	  00C6	93			MOVC A, @A+DPTR
+  117:	  00C7	F5 7D			MOV CZAS+4, A
+  118:
+  119:	  00C9	E5 76			MOV A, HH
+  120:	  00CB	75 F0 0A		MOV B, #10
+  121:	  00CE	84			DIV AB ; dzielenie
+  122:	  00CF	93			MOVC A, @A+DPTR ;
+  123:	  00D0	F5 7A			MOV CZAS+1, A
+  124:	  00D2	E5 F0			MOV A, B
+  125:	  00D4	93			MOVC A, @A+DPTR
+  126:	  00D5	F5 7B			MOV CZAS+2, A
+  127:
+  128:	  00D7	75 79 FF		MOV CZAS+0, #255 ; œwiecenie ledów
+  129:	  00DA	22			RET
+  130:
+  131:	  00DB			WZORY:
+  132:	  00DB	3F 06 5B 4F	DB 00111111B, 00000110B, 01011011B, 01001111B ; od 0 do 3
+  133:	  00DF	66 6D 7D 07	DB 01100110B, 01101101B, 01111101B, 00000111B ; od 4 do 7
+  134:	  00E3	7F 6F 77 7C	DB 01111111B, 01101111B, 01110111B, 01111100B ; od 8 do B
+  135:	  00E7	58 5E 79 71	DB 01011000B, 01011110B, 01111001B, 01110001B ; od C do F
+  136:
+  137:				END
+
+
+
+
+
+                     register banks used:  ---
+
+                     no errors
+
+
+
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 4
+
+
+
+
+
+	       L I S T   O F   S Y M B O L S
+	       =============================
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+??ASEM_51			  NUMBER    8051
+??VERSION			  NUMBER    0130
+AC				  BIT	      D6
+ACC				  DATA	      E0
+ACCNIE60			  CODE	    00A9	  94
+B				  DATA	      F0
+CSDB				  NUMBER    0038	   2
+CSDS				  NUMBER    0030	   1
+CY				  BIT	      D7
+CZAS				  NUMBER    0079	   3
+DPH				  DATA	      83
+DPL				  DATA	      82
+EA				  BIT	      AF
+ES				  BIT	      AC
+ET0				  BIT	      A9
+ET1				  BIT	      AB
+EX0				  BIT	      A8
+EX1				  BIT	      AA
+EXTI0				  CODE	    0003
+EXTI1				  CODE	    0013
+F0				  BIT	      D5
+HH				  NUMBER    0076	   6
+IE				  DATA	      A8
+IE0				  BIT	      89
+IE1				  BIT	      8B
+INT0				  BIT	      B2
+INT1				  BIT	      B3
+IP				  DATA	      B8
+IT0				  BIT	      88
+IT1				  BIT	      8A
+MM				  NUMBER    0077	   5
+NOACC7				  CODE	    0080	  67
+OV				  BIT	      D2
+P				  BIT	      D0
+P0				  DATA	      80
+P1				  DATA	      90
+P2				  DATA	      A0
+P3				  DATA	      B0
+PCON				  DATA	      87
+PETLA				  CODE	    0066	  39
+PRZELICZ			  CODE	    00AD	  98
+PS				  BIT	      BC
+PSW				  DATA	      D0
+PT0				  BIT	      B9
+PT1				  BIT	      BB
+PX0				  BIT	      B8
+PX1				  BIT	      BA
+RB8				  BIT	      9A
+RD				  BIT	      B7
+REN				  BIT	      9C
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 5
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+RESET				  CODE	    0000
+RI				  BIT	      98
+RS0				  BIT	      D3
+RS1				  BIT	      D4
+RXD				  BIT	      B0
+SBUF				  DATA	      99
+SCON				  DATA	      98
+SINT				  CODE	    0023
+SM0				  BIT	      9F
+SM1				  BIT	      9E
+SM2				  BIT	      9D
+SP				  DATA	      81
+SS				  NUMBER    0078	   4
+START				  CODE	    0040	  16
+T0				  BIT	      B4
+T1				  BIT	      B5
+TB8				  BIT	      9B
+TCON				  DATA	      88
+TF0				  BIT	      8D
+TF1				  BIT	      8F
+TH0				  DATA	      8C
+TH1				  DATA	      8D
+TI				  BIT	      99
+TIMER0				  CODE	    000B
+TIMER1				  CODE	    001B
+TL0				  DATA	      8A
+TL1				  DATA	      8B
+TMOD				  DATA	      89
+TR0				  BIT	      8C
+TR1				  BIT	      8E
+TXD				  BIT	      B1
+WR				  BIT	      B6
+WZORY				  CODE	    00DB	 131
