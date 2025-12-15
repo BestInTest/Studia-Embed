@@ -2,17 +2,16 @@
 # Wrzucić do %APPDATA%\JetBrains\CLion202X.x\custom-compiler\sdcc.yaml
 
 compilers:
-  - description: "SDCC 8051 (Windows)"
-    # Regex dopasowujący plik wykonywalny z rozszerzeniem .exe
-    match-sources: ".*\\\\sdcc\\.exe"
+  - description: "SDCC 8051 (Windows Wrapper)"
+    match-sources: ".*sdcc_wrapper(\\.bat)?"
     match-language: "C"
     output-parser: "gcc"
-    
-    # Ścieżki do nagłówków relatywnie do bin/sdcc.exe
+
+    # Ścieżki do kompilatora i nagłówków
     include-dirs:
-      - "${compilerPath}/../include"
-      - "${compilerPath}/../include/mcs51"
-      
+      - "C:/Program Files (x86)/SDCC/include"
+      - "C:/Program Files (x86)/SDCC/include/mcs51"
+
     # Definicje makr, aby CLion rozumiał składnię 8051
     defines-text: |
       #define __SDCC 1
