@@ -2,8 +2,8 @@
 # Wrzucić do %APPDATA%\JetBrains\CLion202X.x\custom-compiler\sdcc.yaml
 
 compilers:
-  - description: "SDCC 8051 (Windows Wrapper)"
-    match-sources: ".*sdcc_wrapper(\\.bat)?"
+  - description: "SDCC 8051 (Windows)"
+    match-sources: ".*\\\\sdcc\\.exe"
     match-language: "C"
     output-parser: "gcc"
 
