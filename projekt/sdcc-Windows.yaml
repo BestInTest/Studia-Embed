@@ -1,0 +1,34 @@
+# Konfiguracja custom kompilatora do CLiona
+# Wrzucić do %APPDATA%\JetBrains\CLion202X.x\custom-compiler\sdcc.yaml
+
+compilers:
+  - description: "SDCC 8051 (Windows)"
+    # Regex dopasowujący plik wykonywalny z rozszerzeniem .exe
+    match-sources: ".*\\\\sdcc\\.exe"
+    match-language: "C"
+    output-parser: "gcc"
+    
+    # Ścieżki do nagłówków relatywnie do bin/sdcc.exe
+    include-dirs:
+      - "${compilerPath}/../include"
+      - "${compilerPath}/../include/mcs51"
+      
+    # Definicje makr, aby CLion rozumiał składnię 8051
+    defines-text: |
+      #define __SDCC 1
+      #define __mcs51 1
+      #define __sfr volatile unsigned char
+      #define __sbit volatile unsigned char
+      #define __at(x)
+      #define __interrupt(x)
+      #define __using(x)
+      #define __critical
+      #define __code
+      #define __data
+      #define __idata
+      #define __pdata
+      #define __xdata
+      #define __bit bool
+      #define __reentrant
+      #define __naked
+      #define __nonbanked

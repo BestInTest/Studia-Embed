@@ -1,0 +1,20 @@
+cmake_minimum_required(VERSION 3.20)
+
+set(CMAKE_SYSTEM_NAME Generic)
+
+set(CMAKE_C_COMPILER "C:/Program Files (x86)/SDCC/bin/sdcc.exe")
+
+project(zegarek C) # nazwa projektu
+set(CMAKE_C_STANDARD 99)
+
+set(CMAKE_C_OUTPUT_EXTENSION .rel)
+
+set(CMAKE_C_FLAGS "")
+set(CMAKE_C_FLAGS_DEBUG "")
+set(CMAKE_C_FLAGS_RELEASE "")
+set(CMAKE_EXE_LINKER_FLAGS "")
+
+set(CMAKE_C_COMPILE_OBJECT "\"${CMAKE_C_COMPILER}\" -mmcs51 -c <SOURCE> -o <OBJECT>")
+set(CMAKE_C_LINK_EXECUTABLE "\"${CMAKE_C_COMPILER}\" -mmcs51 <OBJECTS> -o <TARGET>")
+
+add_executable(firmware main.c) # plik do kompilacji
